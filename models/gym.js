@@ -20,7 +20,7 @@ const GymSchema = new Schema({
     }
 });
 
-//FIXME __ To Be Reported for problems found in our project
+//TODO __ To Be Reported for problems found in our project if to put user id on url and make it scrap-able or abstract it with [...profile/me] method
 const CredentialsSchema = new Schema({
     userUUID: String,
     credentials: [{
@@ -39,17 +39,8 @@ const UserSchema = new Schema({
     }]
 });
 
-// TODO __ check If better to make it seperate files with many exports or one big export
-module.exports = mongoose.model('YelpGym', {
-    GymSchema: GymSchema,
-    CredentialsSchema: CredentialsSchema,
-    UserSchema: UserSchema
-});
+const Gym = mongoose.model('gym', GymSchema);
+const Credentials = mongoose.model('credentials', CredentialsSchema);
+const User = mongoose.model('user', UserSchema);
 
-/* Examble ---------
-    title: String,
-    image: String,
-    price: Number,
-    description: String,
-    location: String
- */
+module.exports = {Gym,Credentials,User};

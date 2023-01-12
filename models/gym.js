@@ -4,16 +4,30 @@ const Schema = mongoose.Schema;
 const GymSchema = new Schema({
     gymUUID: String,
     name: String,
+    hours: String,
+    image: String,
+    email: String,
+    website: String,
+    facebook: String,
+    twitter: String,
+    instgram: String,
     address: {
+        city: String,
         streetName: String,
         contactNumber: String,
-        location: [String, String]/*[latitude, longitude]*/,
+        latitude: String,
+        longitude: String
     },
-    reviews:[{
-        rating: Number,
-        userUUID: String,
-        comment: String
-    }],
+    totalReview:{
+        totalRating: Number,
+        reviewsCount: Number,
+        totalStars:[],
+        review:[{
+            userUUID: String,
+            comment: String,
+            rating: Number
+        }]
+    },
     owner: {
         name: String,
         phoneNumber: String,

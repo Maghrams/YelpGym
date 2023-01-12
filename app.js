@@ -2,7 +2,6 @@ const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
 const GymModel = require('./models/gym');
-const { v4: uuidv4 } = require('uuid');
 
 //localhost:27017 doesn't work because it is not configured properly , so 127.0.0.1:27017 was used
 mongoose.connect('mongodb://127.0.0.1:27017/YelpGym_Database',{
@@ -22,29 +21,33 @@ const app = express();
 
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'))
+
+app.use(express.urlencoded({extended:true}))
+app.get('/',(req, res) =>{
+    res.render('index');
+})
 app.get('/',(req, res) =>{
     res.render('index');
 })
 
+app.get('/gyms', async (req, res) =>{
+    const allGyms = await GymModel.Gym.find({});
+    res.render('gyms/index',{allGyms});
+})
 
-app.get('/newgym', async (req, res) =>{
-    const gym = new GymModel.Gym({
-        gymUUID:uuidv4(),
-        name:"Test Gym",
-        addrress:{
-            streetName:'Nassem',
-            contactNumber:'+966546400149',
-            location:['_21.52530477062381','_39.190138604320246'] //FIXME numbers dont appear in DB, check why .
-        },
-        reviews:[
-        ],
-        owner:{
-            name:'Faisal',
-            phoneNumber:'+966536330154'
-        }
-    });
-    await gym.save();
-    res.send(gym);
+app.get('/gyms/new', (req, res) =>{
+    res.render('gyms/new');
+})
+
+app.post('/gyms',async (req, res) =>{
+    const newGym = new GymModel.Gym(req.body.gym);
+    await newGym.save()
+    res.redirect(`/gyms/${newGym._id}`)
+})
+app.get('/gyms/:id',async (req, res) =>{
+    //using UUID package to identify gyms and users neglecting MongoDB's ID system intentionally
+    const gym = await GymModel.Gym.findById(req.params.id);
+    res.render('gyms/show',{gym});
 })
 
 app.listen(3000, ()=>{

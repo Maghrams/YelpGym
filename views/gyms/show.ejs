@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Show</title>
+</head>
+<body>
+
+<table class="tg">
+    <thead>
+    <tr>
+        <th class="tg-0lax" colspan="2"><img src="<%= gym.image%>" alt="image fo a gym"></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td class="tg-0lax" colspan="2"><%= gym.name%></td>
+    </tr>
+    <tr>
+        <td class="tg-0lax"><%= gym.address%></td>
+        <td class="tg-0lax"><%= gym.totalReview%></td>
+    </tr>
+    <tr>
+        <td class="tg-0lax" colspan="2">
+            <a href="<%= gym.facebook%>">Facebook</a>
+            <a href="<%= gym.twitter%>">Twitter</a>
+            <a href="<%= gym.instgram%>">Instgram</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<footer>
+    <a href="/gyms">Back to main page</a>
+</footer>
+</body>
+</html>

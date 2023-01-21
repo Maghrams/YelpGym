@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
 const GymModel = require('./models/gym');
+const methodOverride = require('method-override');
 
 //localhost:27017 doesn't work because it is not configured properly , so 127.0.0.1:27017 was used
 mongoose.connect('mongodb://127.0.0.1:27017/YelpGym_Database',{
@@ -23,6 +24,7 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'))
 
 app.use(express.urlencoded({extended:true}))
+app.use(methodOverride('_method'))
 app.get('/',(req, res) =>{
     res.render('index');
 })
@@ -40,9 +42,9 @@ app.get('/gyms/new', (req, res) =>{
 })
 
 app.post('/gyms',async (req, res) =>{
-    const newGym = new GymModel.Gym(req.body.gym);
-    await newGym.save()
-    res.redirect(`/gyms/${newGym._id}`)
+    const gym = new GymModel.Gym(req.body.gym);
+    await gym.save()
+    res.redirect(`/gyms/${gym._id}`)
 })
 app.get('/gyms/:id',async (req, res) =>{
     //using UUID package to identify gyms and users neglecting MongoDB's ID system intentionally
@@ -50,6 +52,22 @@ app.get('/gyms/:id',async (req, res) =>{
     res.render('gyms/show',{gym});
 })
 
+app.get("/gyms/:id/edit", async (req, res)=>{
+    const gym = await GymModel.Gym.findById(req.params.id);
+    res.render('gyms/edit',{gym});
+})
+
+app.put("/gyms/:id", async (req, res)=>{
+    const {id} = req.params;
+    const gym = await GymModel.Gym.findByIdAndUpdate(id, {...req.body.gym});
+    res.redirect(`/gyms/${gym._id}`)
+})
+
+app.delete("/gyms/:id", async (req, res)=>{
+    const {id} = req.params;
+    await GymModel.Gym.findByIdAndRemove(id);
+    res.redirect("/gyms");
+})
 app.listen(3000, ()=>{
     console.log('Serving on port 3000');
 })

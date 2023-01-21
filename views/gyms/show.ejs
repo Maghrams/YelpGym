@@ -32,6 +32,14 @@
     </tr>
     </tbody>
 </table>
+<p><a href="/gyms/<%=gym._id%>/edit">Edit</a></p>
+<div>
+    <form action="/gyms/<%=gym._id%>?_method=DELETE" method="POST">
+        <BUTTON>
+            Delete
+        </BUTTON>
+    </form>
+</div>
 
 <footer>
     <a href="/gyms">Back to main page</a>

@@ -1,27 +1,25 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>New Gym</title>
-</head>
-<body>
-    <form action="/gyms" method="POST">
-        <div>
-            <label for="name"> Name </label>
-            <input type="text" id="name" name="gym[name]">
-        </div>
-        <div>
-            <label for="location"> Full Adress </label>
-            <input type="text" id="location" name="gym[address.streetName]">
-        </div>
-        <div>
-            <label for="location"> Owner Name </label>
-            <input type="text" id="location" name="gym[owner.name]">
-        </div>
-        <button>Add Gym</button>
-    </form>
-</body>
-</html>
+<% layout('/layouts/boilerplate')%>
+
+<div class="row">
+    <h1 class="text-center"> New Gym</h1>
+    <div class="col-6 offset-3">
+        <form action="/gyms" method="POST">
+            <div class="mb-3">
+                <label for="name" class="form-label"> Name </label>
+                <input type="text" class="form-control" id="name" name="gym[name]">
+            </div>
+            <div class="mb-3">
+                <label for="location" class="form-label"> Full Adress </label>
+                <input type="text" class="form-control id="location" name="gym[address.streetName]">
+            </div>
+            <div class="mb-3">
+                <label for="location" class="form-label"> Owner Name </label>
+                <input type="text" class="form-control id="location" name="gym[owner.name]">
+            </div>
+            <div class="mb-3">
+                <button class="btn btn-success">Add Gym</button>
+            </div>
+        </form>
+        <a href="/gyms"> All Gyms</a>
+    </div>
+</div>

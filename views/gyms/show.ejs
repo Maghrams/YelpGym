@@ -1,18 +1,8 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Show</title>
-</head>
-<body>
-
+<% layout('/layouts/boilerplate')%>
 <table class="tg">
     <thead>
     <tr>
-        <th class="tg-0lax" colspan="2"><img src="<%= gym.image%>" alt="image fo a gym"></th>
+        <th class="tg-0lax" colspan="2"><img src="<%= gym.image%>" alt="image for a gym"></th>
     </tr>
     </thead>
     <tbody>
@@ -44,5 +34,13 @@
 <footer>
     <a href="/gyms">Back to main page</a>
 </footer>
-</body>
-</html>
+<script>
+    window.addEventListener("load", event => {
+        var image = document.querySelector('img');
+        if(!(image.complete && image.naturalHeight !== 0)){
+            image.src = "https://source.unsplash.com/collection/10043143"
+            image.style.height = "200px"
+            image.style.width = "400px"
+        }
+    });
+</script>

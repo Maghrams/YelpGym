@@ -1,8 +1,10 @@
 const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
+const ejsMate =  require('ejs-mate')
 const GymModel = require('./models/gym');
 const methodOverride = require('method-override');
+const morgan = require('morgan');
 
 //localhost:27017 doesn't work because it is not configured properly , so 127.0.0.1:27017 was used
 mongoose.connect('mongodb://127.0.0.1:27017/YelpGym_Database',{
@@ -20,16 +22,16 @@ db.once("open",()=>{
 
 const app = express();
 
+app.engine('ejs',ejsMate)
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'))
 
 app.use(express.urlencoded({extended:true}))
 app.use(methodOverride('_method'))
+app.use(morgan('dev'))
+
 app.get('/',(req, res) =>{
-    res.render('index');
-})
-app.get('/',(req, res) =>{
-    res.render('index');
+    res.render('home');
 })
 
 app.get('/gyms', async (req, res) =>{
@@ -67,6 +69,11 @@ app.delete("/gyms/:id", async (req, res)=>{
     const {id} = req.params;
     await GymModel.Gym.findByIdAndRemove(id);
     res.redirect("/gyms");
+})
+
+//TODO 404 Route, please amke it a page
+app.use((req, res)=>{
+    res.status(404).render("not_found")
 })
 app.listen(3000, ()=>{
     console.log('Serving on port 3000');

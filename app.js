@@ -31,6 +31,7 @@ app.use(methodOverride('_method'))
 app.use(morgan('dev'))
 
 app.get('/',(req, res) =>{
+    //res.redirect('/gyms')
     res.render('home');
 })
 

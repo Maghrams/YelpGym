@@ -8,7 +8,7 @@
     <div>
         <label for="location"> Full Adress </label>
         <input type="text" id="location" name="gym[address.streetName]" value="<%=gym.address.streetName%>">
-    </div>
+    </div><%=gym.address.streetName%>
     <div>
         <label for="location"> Owner Name </label>
         <input type="text" id="location" name="gym[owner]">
@@ -16,3 +16,26 @@
     <button>Update Gym</button>
 </form>
 <a href="/gyms/<%=gym._id%>">Back to Gym</a>
+<div class="row">
+    <h1 class="text-center"> New Gym</h1>
+    <div class="col-6 offset-3">
+        <form action="/gyms" method="POST">
+            <div class="mb-3">
+                <label for="name" class="form-label"> Name </label>
+                <input type="text" class="form-control" id="name" name="gym[name]" value="<%=gym.name%>"
+            </div>
+            <div class="mb-3">
+                <label for="address" class="form-label"> Full Address </label>
+                <input type="text" class="form-control" id="address" name="gym[address.streetName]" value="<%=gym.address.streetName%>">
+            </div>
+            <div class="mb-3">
+                <label for="location" class="form-label"> Owner Name </label>
+                <input type="text" class="form-control name="gym[owner.name]">
+            </div>
+            <div class="mb-3">
+                <button class="btn btn-success">Add Gym</button>
+            </div>
+        </form>
+        <a href="/gyms"> All Gyms</a>
+    </div>
+</div>

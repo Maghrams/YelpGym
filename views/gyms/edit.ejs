@@ -1,29 +1,15 @@
 <% layout('/layouts/boilerplate')%>
-<h1>Edit Gym</h1>
-<form action="/gyms/<%=gym._id%>?_method=PUT" method="POST">
-    <div>
-        <label for="name"> Name </label>
-        <input type="text" id="name" name="gym[name]" value="<%=gym.name%>">
-    </div>
-    <div>
-        <label for="location"> Full Adress </label>
-        <input type="text" id="location" name="gym[address.streetName]" value="<%=gym.address.streetName%>">
-    </div><%=gym.address.streetName%>
-    <div>
-        <label for="location"> Owner Name </label>
-        <input type="text" id="location" name="gym[owner]">
-    </div>
-    <button>Update Gym</button>
-</form>
-<a href="/gyms/<%=gym._id%>">Back to Gym</a>
+
 <div class="row">
-    <h1 class="text-center"> New Gym</h1>
+    <h1 class="text-center"> Edit Gym</h1>
     <div class="col-6 offset-3">
         <form action="/gyms" method="POST">
             <div class="mb-3">
                 <label for="name" class="form-label"> Name </label>
                 <input type="text" class="form-control" id="name" name="gym[name]" value="<%=gym.name%>"
             </div>
+            <!-- TODO remove break later-->
+            <br>
             <div class="mb-3">
                 <label for="address" class="form-label"> Full Address </label>
                 <input type="text" class="form-control" id="address" name="gym[address.streetName]" value="<%=gym.address.streetName%>">
@@ -36,6 +22,9 @@
                 <button class="btn btn-success">Add Gym</button>
             </div>
         </form>
-        <a href="/gyms"> All Gyms</a>
     </div>
+    <a href="/gyms/<%=gym._id%>">Back to Gym</a>
+    <br>
+    <a  href="/gyms"> All Gyms</a>
 </div>
+

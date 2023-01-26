@@ -22,11 +22,11 @@ const GymSchema = new Schema({
         totalRating: Number,
         reviewsCount: Number,
         totalStars:[],
-        review:[{
+        review:[ {
             userUUID: String,
             comment: String,
             rating: Number
-        }]
+        } ]
     },
     owner: {
         name: String,

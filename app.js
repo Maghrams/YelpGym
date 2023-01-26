@@ -45,6 +45,7 @@ app.get('/gyms/new', (req, res) =>{
 })
 
 app.post('/gyms',async (req, res) =>{
+    console.log(req.body)
     const gym = new GymModel.Gym(req.body.gym);
     await gym.save()
     res.redirect(`/gyms/${gym._id}`)

@@ -50,6 +50,7 @@ app.post('/gyms',async (req, res) =>{
     await gym.save()
     res.redirect(`/gyms/${gym._id}`)
 })
+
 app.get('/gyms/:id',async (req, res) =>{
     //using UUID package to identify gyms and users neglecting MongoDB's ID system intentionally
     const gym = await GymModel.Gym.findById(req.params.id);
@@ -73,7 +74,7 @@ app.delete("/gyms/:id", async (req, res)=>{
     res.redirect("/gyms");
 })
 
-//TODO 404 Route, please amke it a page
+//TODO Apply page not found for non-extisting gym IDs and { /gyms/* } pages
 app.use((req, res)=>{
     res.status(404).render("not_found")
 })

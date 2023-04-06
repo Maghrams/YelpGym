@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const GymModel = require('../models/gym');
 const gymLeads = require("./gym_leads_plus.json")
-const { v4: uuidv4 } = require('uuid');
 
 mongoose.connect('mongodb://127.0.0.1:27017/YelpGym_Database',{
     //Default options with mongoDB connection
@@ -45,7 +44,8 @@ const seedDB = async() =>{
                     gymLeads.GymLeads[i].fourStars,
                     gymLeads.GymLeads[i].threeStars,
                     gymLeads.GymLeads[i].twoStars,
-                    gymLeads.GymLeads[i].oneStars],
+                    gymLeads.GymLeads[i].oneStars
+                ],
                 review:[{
                     userUUID: null,
                     comment: null,

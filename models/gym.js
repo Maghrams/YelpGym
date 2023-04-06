@@ -4,6 +4,7 @@ const Schema = mongoose.Schema;
 const GymSchema = new Schema({
     gymUUID: String,
     name: String,
+    // TODO make wokring hours an array for ease od use
     hours: String,
     image: String,
     email: String,
@@ -31,6 +32,7 @@ const GymSchema = new Schema({
     owner: {
         name: String,
         phoneNumber: String,
+        email: String
     }
 });
 

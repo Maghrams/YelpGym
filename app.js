@@ -1,6 +1,6 @@
 const express = require('express'); //BAck-end framework, used to create server
 const path = require('path');
-const mongoose = require('mongoose'); //MongoDB connection, schema and model (ORM Approach), and query builder
+const mongoose = require('mongoose'); //MongoDB's connection, schema and model (ORM Approach), and query builder
 const ejsMate =  require('ejs-mate') // Template engine for ejs,
 const GymModel = require('./models/gym');
 const methodOverride = require('method-override');//Method override function to fix the problem of not being able to use PUT and DELETE methods
@@ -79,6 +79,16 @@ app.post('/gyms', validateGym,catchAsync(async (req, res) =>{
 //------------------------------------------------
 
 
+//we put {/gyms/:id/edit} first becuase otherwise it will be considered as /gyms/:id IMPORTANT!!!
+//Edit gym page, consist of two operations ,GET and PUT
+//On GET /gyms/:ID/edit request ,
+//Retrieve gym data by ID from DB,
+//Then display Edit page
+app.get("/gyms/:id/edit", catchAsync(async (req, res)=>{
+    const gym = await GymModel.Gym.findById(req.params.id);
+    res.render('gyms/edit',{gym});
+}))
+
 ///On GET request for directory /gym/:ID parse ID and look up in DB for ID,
 //Then retrieve Gym data and display gym with data
 app.get('/gyms/:id',catchAsync(async (req, res) =>{
@@ -89,15 +99,6 @@ app.get('/gyms/:id',catchAsync(async (req, res) =>{
 //--------------------------------
 
 
-//Edit gym page, consist of two operations ,GET and PUT
-//On GET /gyms/:ID/edit request ,
-//Retrieve gym data by ID from DB,
-//Then display Edit page
-app.get("/gyms/:id/edit", catchAsync(async (req, res)=>{
-    const gym = await GymModel.Gym.findById(req.params.id);
-    res.render('gyms/edit',{gym});
-}))
-
 //On submitting Edit form
 //First Validate data using validateGYm(),
 //Then take ID and update gym on DB with gym data
@@ -105,6 +106,7 @@ app.get("/gyms/:id/edit", catchAsync(async (req, res)=>{
 app.put("/gyms/:id",validateGym, catchAsync(async (req, res)=>{
     const {id} = req.params;
     const gym = await GymModel.Gym.findByIdAndUpdate(id, {...req.body.gym});
+    console.log(req.body)
     res.redirect(`/gyms/${gym._id}`)
 }))
 //--------------------------------------

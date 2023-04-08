@@ -1,9 +1,15 @@
 const mongoose = require('mongoose');
 const GymModel = require('../models/gym');
 const gymLeads = require("./gym_leads_plus.json")
+require('dotenv').config()
+// mongoose.connect('mongodb://127.0.0.1:27017/YelpGym_Database',{
+//     //Default options with mongoDB connection
+//     useNewUrlParser: true,
+//     useCreateIndex: true,
+//     useUnifiedTopology: true
+// });
 
-mongoose.connect('mongodb://127.0.0.1:27017/YelpGym_Database',{
-    //Default options with mongoDB connection
+mongoose.connect(process.env.CONNECTION_STRING, {
     useNewUrlParser: true,
     useCreateIndex: true,
     useUnifiedTopology: true
@@ -20,7 +26,6 @@ const seedDB = async() =>{
     await GymModel.Gym.deleteMany({})
     for (i = 0; i < gymLeads.GymLeads.length; i++){
         const gym = new GymModel.Gym({
-            gymUUID: uuidv4(),
             name: gymLeads.GymLeads[i].Name,
             hours: gymLeads.GymLeads[i].Hours,
             image: gymLeads.GymLeads[i].Top_Image_URL,

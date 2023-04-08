@@ -1,3 +1,4 @@
+require('dotenv').config()
 const express = require('express'); //BAck-end framework, used to create server
 const path = require('path');
 const mongoose = require('mongoose'); //MongoDB connection, schema and model (ORM Approach), and query builder
@@ -11,18 +12,20 @@ const {gymSchema} = require('./schemas.js');//Validation framework to validate t
 
 //FIXME localhost:27017 doesn't work because it is not configured properly , so 127.0.0.1:27017 was used
 //Initialize Connection to MongoDB with parameters
-mongoose.connect('mongodb://127.0.0.1:27017/YelpGym_Database',{
-    //Default options with mongoDB connection
+
+mongoose.connect(process.env.CONNECTION_STRING, {
     useNewUrlParser: true,
     useCreateIndex: true,
     useUnifiedTopology: true
 });
+
 //Connect to DB
 const db = mongoose.connection;
 db.on("error",console.error.bind(console,"connection error"));
 db.once("open",()=>{
     console.log("Database connected")
 })
+
 //Initialize express app
 const app = express();
 

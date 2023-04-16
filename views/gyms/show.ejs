@@ -1,9 +1,9 @@
 
-//<!--show each indivisual GYm-->
+<!--show each individual Gym-->
 
 <% layout('/layouts/boilerplate')%>
 <div class="row">
-    <div class="col-6 offset-3">
+    <div class="col-6">
         <div class="card" >
             <img class="card-img-top" src="<%= gym.image%>" alt="Card image cap">
             <div class="card-body">
@@ -42,6 +42,31 @@
             <a href="/gyms">Back to main page</a>
         </footer>
     </div>
+    <div class="col-6">
+        <h2>Leave a Review</h2>
+        <form action="/gyms/<%=gym._id%>/reviews" method="POST" class="mb-3 validated-form" novalidate>
+            <div class="mb-3">
+                <label class="form-label" for="rating">Rating</label>
+                <input class="form-range" type="range" min="1" max="5" name="review[rating]" id="rating">
+            </div>
+            <div class="mb-3">
+                <label class="form-label" for="body">Review: </label>
+                <textarea class="form-control" name="review[body]" id="body" cols="30" rows="3" required></textarea>
+            </div>
+            <button class="btn btn-success">Submit</button>
+        </form>
+        <% for(let review of gym.totalReview.reviews){%>
+        <div class="card mb-3">
+            <div class=" card-body">
+                <h5 class="card-title">Rating: <%=review.rating%></h5>
+                <p class="card-text">Review: <%=review.body%></p>
+                <form action="/gyms/<%=gym._id%>/reviews/<%=review._id%>?_method=DELETE" method="POST">
+                    <button class="btn btn-sm btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+        <%}%>
+    </div>
 </div>
 
 <!--In Case image is not displayed, request generic gym image from unsplash API-->
@@ -52,24 +77,5 @@
             image.src = "https://source.unsplash.com/collection/10043143"
         }
     });
-
-    (function () {
-        'use strict'
-
-        // Fetch all the forms we want to apply custom Bootstrap validation styles to
-        const forms = document.querySelectorAll('.validated-form')
-
-        // Loop over them and prevent submission
-        Array.from(forms)
-            .forEach(function (form) {
-                form.addEventListener('submit', function (event) {
-                    if (!form.checkValidity()) {
-                        event.preventDefault()
-                        event.stopPropagation()
-                    }
-                    form.classList.add('was-validated')
-                }, false)
-            })
-    })()
 
 </script>

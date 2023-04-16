@@ -1,6 +1,6 @@
 const Joi = require('joi');
 
-module.exports.gymSchema = Joi.object({
+module.exports.gymValidationSchema = Joi.object({
 
     gym: Joi.object({
         name: Joi.string().required(),
@@ -20,7 +20,14 @@ module.exports.gymSchema = Joi.object({
             email: Joi.string().email().required(),
         })
 
-    }).required()
+    }).required().unknown(true)
+})
+
+module.exports.reviewValidationSchema = Joi.object({
+    review: Joi.object({
+        body: Joi.string().required(),
+        rating: Joi.number().required().min(1).max(5)
+    }).required().unknown(true)
 })
 
 

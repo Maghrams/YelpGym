@@ -1,10 +1,9 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-
-const GymSchema = new Schema({
-    gymUUID: String,
+const Review = require('./review');
+const gymSchema = new Schema({
     name: String,
-    // TODO make wokring hours an array for ease od use
+    // TODO make working hours an array for ease od use
     hours: String,
     image: String,
     email: String,
@@ -23,11 +22,12 @@ const GymSchema = new Schema({
         totalRating: Number,
         reviewsCount: Number,
         totalStars:[],
-        review:[ {
-            userUUID: String,
-            comment: String,
-            rating: Number
-        } ]
+        reviews:[
+            {
+                type: Schema.Types.ObjectId,
+                ref:'Review'
+            }
+        ]
     },
     owner: {
         name: String,
@@ -36,27 +36,24 @@ const GymSchema = new Schema({
     }
 });
 
-//TODO __ To Be Reported for problems found in our project if to put user id on url and make it scrap-able or abstract it with [...profile/me] method
-const CredentialsSchema = new Schema({
-    userUUID: String,
-    credentials: [{
-        email: String,
-        password: String
-    }]
-});
+// gymSchema.post('findOneAndDelete', async function (doc) {
+//     if (doc) {
+//         await Review.deleteMany({
+//             _id: {
+//                 $in: doc.totalReview.reviews
+//             }
+//         })
+//     }
+// })
+gymSchema.post('findOneAndDelete', async function (doc) {
+    //mongoDB using post findoneanddelete middleware to delete a nested review after deleting a gym such as doc.totalReview.reviews
+    //{You.com}
+    if (doc && doc.totalReview.reviews.length > 0) {
+        // delete all the reviews of the deleted gym
+        const reviewIds = doc.totalReview.reviews.map(review => review._id);
+        console.log(reviewIds,doc);
+        await Review.deleteMany({ _id: { $in: reviewIds } });
+    }
+})
 
-const UserSchema = new Schema({
-    userUUID: String,
-    name: String,
-    reviews: [{
-        gymUUID: String,
-        rating: Number,
-        comment: String
-    }]
-});
-
-const Gym = mongoose.model('gym', GymSchema);
-const Credentials = mongoose.model('credentials', CredentialsSchema);
-const User = mongoose.model('user', UserSchema);
-
-module.exports = {Gym,Credentials,User};
+module.exports = mongoose.model('Gym', gymSchema);

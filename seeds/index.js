@@ -1,9 +1,10 @@
-const mongoose = require('mongoose');
+require('dotenv').config({path : '../.env'})
+const mongoose = require('mongoose')
 const GymModel = require('../models/gym');
 const gymLeads = require("./gym_leads_plus.json")
+const ReviewModel = require("../models/review");
 
-mongoose.connect('mongodb://127.0.0.1:27017/YelpGym_Database',{
-    //Default options with mongoDB connection
+mongoose.connect(process.env.CONNECTION_STRING, {
     useNewUrlParser: true,
     useCreateIndex: true,
     useUnifiedTopology: true
@@ -17,10 +18,11 @@ db.once("open",()=>{
 
 const seedDB = async() =>{
     //Deletes Data from the DB then replaces it with new data
-    await GymModel.Gym.deleteMany({})
-    for (i = 0; i < gymLeads.GymLeads.length; i++){
-        const gym = new GymModel.Gym({
-            gymUUID: uuidv4(),
+    await GymModel.deleteMany({})
+    await ReviewModel.deleteMany({})
+
+    for (let i = 0; i < gymLeads.GymLeads.length; i++){
+        const gym = new GymModel({
             name: gymLeads.GymLeads[i].Name,
             hours: gymLeads.GymLeads[i].Hours,
             image: gymLeads.GymLeads[i].Top_Image_URL,
@@ -46,17 +48,12 @@ const seedDB = async() =>{
                     gymLeads.GymLeads[i].twoStars,
                     gymLeads.GymLeads[i].oneStars
                 ],
-                review:[{
-                    userUUID: null,
-                    comment: null,
-                    rating: null
-                }]
+                reviews:[]
             },
             owner: {
                 name: null,
                 phoneNumber: null,
             }
-
         })
         await gym.save();
     }

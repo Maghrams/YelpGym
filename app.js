@@ -3,19 +3,20 @@ const express = require('express'); //BAck-end framework, used to create server
 const path = require('path');
 const mongoose = require('mongoose'); //sMongoDB connections, schema and model (ORM Approach), and query builder
 const ejsMate =  require('ejs-mate') // Template engine for ejs,
-const GymModel = require('./models/gym');
-const ReviewModel = require("./models/review");
 const methodOverride = require('method-override');//Method override function to fix the problem of not being able to use PUT and DELETE methods
 const morgan = require('morgan');//DEV info to check API requests
-const catchAsync = require('./utils/catchAsync');//Replace Try/Catch with a function that overlaps all functions
-const ExpressError = require('./utils/ExpressError');//Extend Error class with message & status_code functions
-const {gymValidationSchema,reviewValidationSchema} = require('./schemas.js');//Validation framework to validate try of inputs
+const session = require('express-session');//Session middleware to store user data
+const flash = require('connect-flash');//Flash middleware to send messages to the user
+const gymRoutes = require('./routes/gyms');//Import gym routes
+const reviewRoutes = require('./routes/reviews');//Import review routes
+
 
 //Initialize Connection to MongoDB with parameters
 mongoose.connect(process.env.CONNECTION_STRING, {
     useNewUrlParser: true,
     useCreateIndex: true,
-    useUnifiedTopology: true
+    useUnifiedTopology: true,
+    useFindAndModify: false,
 }).then();
 
 //Connect to DB
@@ -36,114 +37,36 @@ app.use(express.urlencoded({extended:true}))
 app.use(methodOverride('_method'))
 app.use(morgan('dev'))
 app.use('/favicon.ico', express.static('resources/favicon.ico'));
+app.use(express.static(path.join(__dirname, 'public')))
 
-//MIDDLEWARES
-//Validation middleware, to validate gym inputs
-const validateGym = (req, res, next) =>{
-
-    const {error} = gymValidationSchema.validate(req.body);
-    if(error){
-        const msg = error.details.map(el => el.message).join(',')
-        throw new ExpressError(msg, 400);
-
-    }else{next();}
+const sessionConfig = {
+    secret: process.env.SECRET,
+    resave: false,
+    saveUninitialized: true,
+    cookie: {
+        httpOnly: true,
+        expires: Date.now() + 1000*60*60*24*7,
+        maxAge: 1000*60*60*24*7
+    }
 }
+app.use(session(sessionConfig))
+app.use(flash())
 
-const validateReview = (req, res, next) =>{
-    const {error} = reviewValidationSchema.validate(req.body);
-    if(error){
-        const msg = error.details.map(el => el.message).join(',')
-        throw new ExpressError(msg, 400);
-    }else{next();}
-}
+//Custom Middleware to send flash messages to the user
+app.use((req, res, next)=>{
+    res.locals.success = req.flash('success');
+    res.locals.error = req.flash('error');
+    next();
+})
+
+//Routes
+app.use('/gyms',gymRoutes);
+app.use('/gyms/:id/reviews',reviewRoutes);
 
 //On GET root directory request => render home page
 app.get('/',(req, res) =>{
     res.render('home');
 })
-//On GET gyms directory request => render gyms page
-app.get('/gyms', catchAsync(async (req, res) =>{
-    //Query all gyms from Database and save them to allGyms
-    const allGyms = await GymModel.find({});
-    //Render all gyms page and send allGYms list for EJS engine
-    res.render('gyms/index',{allGyms});
-}))
-
-// Add new GYm function, consist of two operations, GET and POST
-//------------------------------------------------
-//On GET /gyms/new directory request => render new page
-app.get('/gyms/new', (req, res) =>{
-    res.render('gyms/new');
-})
-
-/*On POST request via new gym form , First: Validate inputs using validateGym(),
-Catch Errors using catchAsync,
-After that, start creating new gym object using GymModel and save it to DB,
-Then redirect to the new gym page
-*/
-
-app.post('/gyms', validateGym,catchAsync(async (req, res) =>{
-    const gym = new GymModel(req.body.gym);
-    await gym.save()
-    res.redirect(`/gyms/${gym._id}`)
-}))
-//------------------------------------------------
-
-
-///On GET request for directory /gym/:ID parse ID and look up in DB for ID,
-//Then retrieve Gym data and display gym with data
-app.get('/gyms/:id',catchAsync(async (req, res) =>{
-    const gym = await GymModel.findById(req.params.id).populate('totalReview.reviews');
-    res.render('gyms/show',{gym});
-}))
-//--------------------------------
-
-
-//Edit gym page, consist of two operations ,GET and PUT
-//On GET /gyms/:ID/edit request ,
-//Retrieve gym data by ID from DB,
-//Then display Edit page
-app.get("/gyms/:id/edit", catchAsync(async (req, res)=>{
-    const gym = await GymModel.findById(req.params.id);
-    res.render('gyms/edit',{gym});
-}))
-
-//On submitting Edit form
-//First Validate data using validateGYm(),
-//Then take ID and update gym on DB with gym data
-//Lastly redirect to show gym page
-app.put("/gyms/:id",validateGym, catchAsync(async (req, res)=>{
-    const {id} = req.params;
-    const gym = await GymModel.findByIdAndUpdate(id, {...req.body.gym});
-    res.redirect(`/gyms/${gym._id}`)
-}))
-//--------------------------------------
-
-//On clicking Delete button from SHow gym page
-//fetch gym ID and look it up in DB then Delete gym
-//THen redirect to All gyms (index) page
-app.delete("/gyms/:id", catchAsync(async (req, res)=>{
-    const {id} = req.params;
-    await GymModel.findByIdAndRemove(id);
-    res.redirect("/gyms");
-}))
-
-app.post('/gyms/:id/reviews',validateReview, catchAsync(async (req, res)=>{
-    const gym = await GymModel.findById(req.params.id);
-    const review = new ReviewModel(req.body.review);
-    gym.totalReview.reviews.push(review);
-    await review.save();
-    await gym.save();
-    res.redirect(`/gyms/${gym._id}`)
-}))
-
-app.delete('/gyms/:id/reviews/:reviewId', catchAsync(async (req, res)=> {
-    const {id, reviewId} = req.params;
-    // how use mongoDB pull operator to remove from an array nested inside such as totalReviews.reviews show @Abdoh_Ardi later {{used You.com}}
-    await GymModel.findByIdAndUpdate(id, { $pull: { "totalReviews.reviews": { reviewId: "review_id" } } });//Delete review from gym collection
-    await ReviewModel.findByIdAndDelete(reviewId); //Delete review from reviews collection
-    res.redirect(`/gyms/${id}`);
-}))
 
 //TODO Apply page not found for non-existing gym IDs and { /gyms/* } pages
 //If Page doesnt exist, render not_found page and send 404 status code

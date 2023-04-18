@@ -36,22 +36,12 @@ const gymSchema = new Schema({
     }
 });
 
-// gymSchema.post('findOneAndDelete', async function (doc) {
-//     if (doc) {
-//         await Review.deleteMany({
-//             _id: {
-//                 $in: doc.totalReview.reviews
-//             }
-//         })
-//     }
-// })
-gymSchema.post('findOneAndDelete', async function (doc) {
+gymSchema.post('findOneAndRemove', async function (doc) {
     //mongoDB using post findoneanddelete middleware to delete a nested review after deleting a gym such as doc.totalReview.reviews
     //{You.com}
     if (doc && doc.totalReview.reviews.length > 0) {
         // delete all the reviews of the deleted gym
         const reviewIds = doc.totalReview.reviews.map(review => review._id);
-        console.log(reviewIds,doc);
         await Review.deleteMany({ _id: { $in: reviewIds } });
     }
 })

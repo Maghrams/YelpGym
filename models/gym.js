@@ -30,14 +30,13 @@ const gymSchema = new Schema({
         ]
     },
     owner: {
-        name: String,
-        phoneNumber: String,
-        email: String
+        type: Schema.Types.ObjectId,
+        ref: 'User'
     }
 });
 
 gymSchema.post('findOneAndRemove', async function (doc) {
-    //mongoDB using post findoneanddelete middleware to delete a nested review after deleting a gym such as doc.totalReview.reviews
+    //mongoDB using post findOneAndDelete middleware to delete a nested review after deleting a gym such as doc.totalReview.reviews
     //{You.com}
     if (doc && doc.totalReview.reviews.length > 0) {
         // delete all the reviews of the deleted gym

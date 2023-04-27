@@ -4,11 +4,11 @@ const catchAsync = require('../utils/catchAsync');//Replace Try/Catch with a fun
 const ExpressError = require('../utils/ExpressError');//Extend Error class with message & status_code functions
 const {gymValidationSchema} = require('../schemas.js');//Validation framework to validate try of inputs
 const GymModel = require('../models/gym');
+const {isLoggedIn} = require('../middleware');
 
 //MIDDLEWARES
 //Validation middleware, to validate gym inputs
 const validateGym = (req, res, next) =>{
-
     const {error} = gymValidationSchema.validate(req.body);
     if(error){
         const msg = error.details.map(el => el.message).join(',')
@@ -29,7 +29,7 @@ router.get('/', catchAsync(async (req, res) =>{
 // Add new GYm function, consist of two operations, GET and POST
 //------------------------------------------------
 //On GET /gyms/new directory request => render new page
-router.get('/new', (req, res) =>{
+router.get('/new' ,isLoggedIn, (req, res) =>{
     res.render('gyms/new');
 })
 
@@ -39,10 +39,11 @@ After that, start creating new gym object using GymModel and save it to DB,
 Then redirect to the new gym page
 */
 
-router.post('/', validateGym,catchAsync(async (req, res) =>{
+router.post('/',isLoggedIn , validateGym, catchAsync(async (req, res) =>{
     const gym = new GymModel(req.body.gym);
+    gym.owner = req.user._id; //Set owner of gym to the current user
     await gym.save()
-    req.flash('success','Successfully made a new gym!');
+    req.flash('success','Succ essfully made a new gym!');
     res.redirect(`/gyms/${gym._id}`)
 }))
 //------------------------------------------------
@@ -50,8 +51,11 @@ router.post('/', validateGym,catchAsync(async (req, res) =>{
 
 ///On GET request for directory /gym/:ID parse ID and look up in DB for ID,
 //Then retrieve Gym data and display gym with data
+//TODO make sure that user is logged in before submitting a review not before showing gym page
 router.get('/:id',catchAsync(async (req, res) =>{
-    const gym = await GymModel.findById(req.params.id).populate('totalReview.reviews');
+    const gym = await GymModel.findById(req.params.id)
+        .populate('totalReview.reviews')
+        .populate('owner');
     if(!gym){
         req.flash('error','Cannot find that gym!');
         return res.redirect('/gyms');
@@ -65,7 +69,8 @@ router.get('/:id',catchAsync(async (req, res) =>{
 //On GET /gyms/:ID/edit request ,
 //Retrieve gym data by ID from DB,
 //Then display Edit page
-router.get("/:id/edit", catchAsync(async (req, res)=>{
+//TODO make sure that only owner can edit a gym page
+router.get("/:id/edit",isLoggedIn , catchAsync(async (req, res)=>{
     const gym = await GymModel.findById(req.params.id);
     if(!gym){
         req.flash('error','Cannot find that gym!');
@@ -78,7 +83,7 @@ router.get("/:id/edit", catchAsync(async (req, res)=>{
 //First Validate data using validateGYm(),
 //Then take ID and update gym on DB with gym data
 //Lastly redirect to show gym page
-router.put("/:id",validateGym, catchAsync(async (req, res)=>{
+router.put("/:id",isLoggedIn ,validateGym, catchAsync(async (req, res)=>{
     const {id} = req.params;
     const gym = await GymModel.findByIdAndUpdate(id, {...req.body.gym});
     req.flash('success','Successfully updated gym!');
@@ -89,7 +94,7 @@ router.put("/:id",validateGym, catchAsync(async (req, res)=>{
 //On clicking Delete button from SHow gym page
 //fetch gym ID and look it up in DB then Delete gym
 //THen redirect to All gyms (index) page
-router.delete("/:id", catchAsync(async (req, res)=>{
+router.delete("/:id",isLoggedIn , catchAsync(async (req, res)=>{
     const {id} = req.params;
     await GymModel.findByIdAndRemove(id);
     req.flash('success','Successfully deleted gym!');

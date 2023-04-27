@@ -11,7 +11,6 @@ const passport = require('passport');//Passport middleware to authenticate users
 const LocalStrategy = require('passport-local');//Local Strategy to authenticate users with username and password
 const User = require('./models/user');//Import User model
 
-
 //Import Routes
 const gymRoutes = require('./routes/gyms');//Import gym routes
 const reviewRoutes = require('./routes/reviews');//Import review routes
@@ -64,14 +63,14 @@ passport.use(new LocalStrategy(User.authenticate()));
 //These two methods are provided by passport-local-mongoose for session storing and destroying
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
+
 //Custom Middleware to send flash messages to the user
 app.use((req, res, next)=>{
+    res.locals.currentUser = req.user;
     res.locals.success = req.flash('success');
     res.locals.error = req.flash('error');
     next();
 })
-
-
 
 //Routes
 app.use('/gyms',gymRoutes);
@@ -86,9 +85,9 @@ app.get('/',(req, res) =>{
 //TODO Apply page not found for non-existing gym IDs and { /gyms/* } pages
 //If Page doesnt exist, render not_found page and send 404 status code
 
-// app.all('*',(req, res,next)=>{
-//     res.status(404).render("not_found")
-// })
+app.all('*',(req, res,next)=>{
+    res.status(404).render("not_found")
+})
 
 //Error Middleware if any error occur from catchAsync function send it here,
 //It's either a predefined error that has a predefined error message and status code

@@ -50,10 +50,7 @@ const seedDB = async() =>{
                 ],
                 reviews:[]
             },
-            owner: {
-                name: null,
-                phoneNumber: null,
-            }
+            owner: '64420bf1a831f244da71a4e0'
         })
         await gym.save();
     }

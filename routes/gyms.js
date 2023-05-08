@@ -72,6 +72,7 @@ router.get('/:id',catchAsync(async (req, res) =>{
 //TODO make sure that only owner can edit a gym page
 router.get("/:id/edit",isLoggedIn , catchAsync(async (req, res)=>{
     const gym = await GymModel.findById(req.params.id);
+
     if(!gym){
         req.flash('error','Cannot find that gym!');
         return res.redirect('/gyms');
@@ -85,7 +86,12 @@ router.get("/:id/edit",isLoggedIn , catchAsync(async (req, res)=>{
 //Lastly redirect to show gym page
 router.put("/:id",isLoggedIn ,validateGym, catchAsync(async (req, res)=>{
     const {id} = req.params;
-    const gym = await GymModel.findByIdAndUpdate(id, {...req.body.gym});
+    const gym = await GymModel.findById(id)
+    if(!gym.owner.equals(req.user._id)){
+        req.flash('error','You do not have permission to do that!');
+        return res.redirect(`/gyms/${id}`);
+    }
+    /* const gymm =*/ await GymModel.findByIdAndUpdate(id, {...req.body.gym});
     req.flash('success','Successfully updated gym!');
     res.redirect(`/gyms/${gym._id}`)
 }))

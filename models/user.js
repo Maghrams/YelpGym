@@ -5,7 +5,7 @@ const passportLocalMongoose = require('passport-local-mongoose');
 
 const userSchema = new Schema({
     //Added by Passport Plugin
-    // name: {
+    // username: {
     //     type: String,
     //     required: true
     // },
@@ -13,6 +13,11 @@ const userSchema = new Schema({
     //     type: String,
     //     required: true
     // },
+    name: {
+        type: String,
+        required: true
+    },
+    phoneNumber: String,
     email: {
         type: String,
         required: true,

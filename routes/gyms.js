@@ -8,48 +8,44 @@ const User = require("../models/user");
 
 //ROUTES
 
-//On GET gyms directory request => render gyms page
-router.get("/", catchAsync(gymController.index));
+//--------------------Index Gym Routes--------------------
+/*
+This code block defines a set of API routes for managing gym resources in an Express.js application at the root level of the resource. There are two HTTP methods supported:
 
-// Add new GYm function, consist of two operations, GET and POST
-//------------------------------------------------
+1. `GET`: Fetches and displays a list of all gyms using the `index` method from the `gymController`.
+2. `POST`: Creates a new gym using the `createGym` method from the `gymController`. This route is protected by two middlewares: `isLoggedIn` and `validateGym`, which ensure the user is authenticated and the submitted data is valid, respectively.
+
+Both the controller methods are wrapped in `catchAsync` to handle and propagate errors properly.
+ */
+router.route('/')
+    .get( catchAsync(gymController.index))
+    .post( isLoggedIn, validateGym, catchAsync(gymController.createGym)
+);
+
 //On GET /gyms/new directory request => render new page
 router.get("/new", isLoggedIn, gymController.renderNewForm);
 
-/*On POST request via new gym form , First: Validate inputs using validateGym(),
-Catch Errors using catchAsync,
-After that, start creating new gym object using GymModel and save it to DB,
-Then redirect to the new gym page
-*/
 
-router.post("/", isLoggedIn, validateGym, catchAsync(gymController.createGym)
-);
 
-//------------------------------------------------
+//--------------------Show Gym Routes--------------------
+/*
+This code block defines a set of API routes for a gym resource in an Express.js application. The routes are based on the gym's `id` parameter. There are three HTTP methods supported:
 
-///On GET request for directory /gym/:ID parse ID and look up in DB for ID,
-//Then retrieve Gym data and display gym with data
-//TODO make sure that user is logged in before submitting a review not before showing gym page
-router.get("/:id", catchAsync(gymController.showGym));
-//--------------------------------
+1. `GET`: Fetches and displays the information of a gym with the specified `id` using the `showGym` method from the `gymController`.
+2. `PUT`: Updates the information of a gym with the specified `id` using the `updateGym` method from the `gymController`. This route is protected by three middlewares: `isLoggedIn`, `isOwner`, and `validateGym`, which ensure the user is authenticated, the owner of the gym, and the submitted data is valid, respectively.
+3. `DELETE`: Removes a gym with the specified `id` using the `deleteGym` method from the `gymController`. This route is protected by two middlewares: `isLoggedIn` and `isOwner`, which ensure the user is authenticated and the owner of the gym, respectively.
 
-//Edit gym page, consist of two operations ,GET and PUT
-//On GET /gyms/:ID/edit request ,
-//Retrieve gym data by ID from DB,
-//Then display Edit page
-//TODO make sure that only owner can edit a gym page
+All controller methods are wrapped in `catchAsync` to handle and propagate errors properly.
+ */
+router.route('/:id')
+    .get( catchAsync(gymController.showGym))
+    .put( isLoggedIn, isOwner, validateGym, catchAsync(gymController.updateGym))
+    .delete( isLoggedIn, isOwner, catchAsync(gymController.deleteGym));
+
+//On GET /gyms/:id/edit directory request => render edit page
 router.get("/:id/edit", isLoggedIn, isOwner, catchAsync(gymController.renderEditForm));
 
-//On submitting Edit form
-//First Validate data using validateGYm(),
-//Then take ID and update gym on DB with gym data
-//Lastly redirect to show gym page
-router.put("/:id", isLoggedIn, validateGym, isOwner, catchAsync(gymController.updateGym));
-//--------------------------------------
-
-//On clicking Delete button from SHow gym page
-//fetch gym ID and look it up in DB then Delete gym
-//THen redirect to All gyms (index) page
-router.delete("/:id", isLoggedIn, isOwner, catchAsync(gymController.deleteGym));
-
+/*
+3. `module.exports = router;`: Exports the router object, making the defined routes available for use in other parts of the application.
+ */
 module.exports = router;

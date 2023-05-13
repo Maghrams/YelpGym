@@ -4,9 +4,30 @@
 <% layout('/layouts/boilerplate')%>
 <link rel="stylesheet" href="/stylesheets/stars.css">
 <div class="row">
-    <div class="col-6 mb-4">
-        <div class="card" >
-            <img class="card-img-top" referrerpolicy="no-referrer" src="<%= gym.image%>" alt="Card image cap">
+    <div class="col-6 ">
+        <div id="GymCarousel" class="carousel slide">
+            <div class="carousel-inner">
+                <% gym.images.forEach((img, i)=> { %>
+                    <div class="carousel-item <%=i===0?'active':' '%>">
+                        <img src="<%= img.url%>" class="d-block w-100" alt="...">
+                    </div>
+                <%})%>
+            </div>
+            <%if(gym.images.length > 1){%>
+            <button class="carousel-control-prev" type="button" data-bs-target="#GymCarousel" data-bs-slide="prev">
+                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#GymCarousel" data-bs-slide="next">
+                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                <span class="visually-hidden">Next</span>
+            </button>
+            <%}%>
+        </div>
+        <div class="card mb-4">
+<!--            <% for(let img of gym.images){ %>-->
+<!--                <img class="card-img-top" referrerpolicy="no-referrer" src="<%= img.url%>" alt="Card image cap">-->
+<!--            <%}%>-->
             <div class="card-body">
                 <h5 class="card-title"><%= gym.name%></h5>
                 <p class="card-text text-muted"><%= gym.address.streetName%></p>

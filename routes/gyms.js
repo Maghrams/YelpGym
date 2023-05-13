@@ -2,9 +2,10 @@ const express = require("express");
 const router = express.Router({mergeParams: true});
 const gymController = require("../controllers/gyms");
 const catchAsync = require("../utils/catchAsync"); //Replace Try/Catch with a function that overlaps all functions
-const GymModel = require("../models/gym");
 const {isLoggedIn, validateGym, isOwner} = require("../middleware");
-const User = require("../models/user");
+const {storage} = require("../cloudinary");
+const multer = require("multer");
+const upload = multer({storage});
 
 //ROUTES
 
@@ -19,7 +20,7 @@ Both the controller methods are wrapped in `catchAsync` to handle and propagate 
  */
 router.route('/')
     .get( catchAsync(gymController.index))
-    .post( isLoggedIn, validateGym, catchAsync(gymController.createGym)
+    .post( isLoggedIn,upload.array('image') ,validateGym , catchAsync(gymController.createGym)
 );
 
 //On GET /gyms/new directory request => render new page

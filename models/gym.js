@@ -5,7 +5,10 @@ const gymSchema = new Schema({
     name: String,
     // TODO make working hours an array for ease od use
     hours: String,
-    image: String,
+    images: [{
+        url: String,
+        filename: String
+    }],
     email: String,
     website: String,
     facebook: String,

@@ -6,7 +6,7 @@ module.exports.gymValidationSchema = Joi.object({
         name: Joi.string().required(),
         // TODO make wokring hours an array for ease od use
         hours: Joi.string().required(),
-        image: Joi.string(),
+        // image: Joi.string(),
         email: Joi.string().email(),
         website: Joi.string(),
         address: Joi.object({

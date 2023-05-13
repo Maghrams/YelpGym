@@ -11,9 +11,12 @@ module.exports.renderNewForm = (req, res) => {
 }
 
 module.exports.createGym = async (req, res, next) => {
+    req.files.map(f =>({url: f.path, filename: f.filename}));
     const gym = new GymModel(req.body.gym);
+    gym.images = req.files.map(f =>({url: f.path, filename: f.filename}));
     gym.owner = req.user._id;
     await gym.save();
+    console.log(gym);
     req.flash("success", "Successfully made a new gym!");
     res.redirect(`/gyms/${gym._id}`);
 }

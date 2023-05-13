@@ -1,4 +1,6 @@
-require('dotenv').config()
+if (process.env.NODE_ENV !== "production") {
+    require('dotenv').config()
+}
 const express = require('express'); //Back-end framework, used to create server
 const path = require('path');//Path module to get the path of the current directory, make it works with different OSes
 const mongoose = require('mongoose'); //sMongoDB connections, schema and model (ORM Approach), and query builder

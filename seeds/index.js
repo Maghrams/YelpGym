@@ -1,22 +1,25 @@
-require('dotenv').config({path : '../.env'})
+require('dotenv').config()
 const mongoose = require('mongoose')
 const GymModel = require('../models/gym');
 const gymLeads = require("./gym_leads_plus.json")
 const ReviewModel = require("../models/review");
-
-mongoose.connect(process.env.CONNECTION_STRING, {
-    useNewUrlParser: true,
-    useCreateIndex: true,
-    useUnifiedTopology: true
-});
-
-const db = mongoose.connection;
-db.on("error",console.error.bind(console,"connection error"));
-db.once("open",()=>{
-    console.log("Database connected")
-})
+const { v4: uuidv4 } = require('uuid');
 
 const seedDB = async() =>{
+
+    await mongoose.connect(process.env.CONNECTION_STRING, {
+        useNewUrlParser: true,
+        useCreateIndex: true,
+        useUnifiedTopology: true,
+        useFindAndModify: false,
+    }).then();
+
+    const db =  await mongoose.connection;
+    db.on("error", console.error.bind(console, "connection error"));
+    db.once("open", () => {
+        console.log("Database connected")
+    })
+
     //Deletes Data from the DB then replaces it with new data
     await GymModel.deleteMany({})
     await ReviewModel.deleteMany({})
@@ -25,7 +28,12 @@ const seedDB = async() =>{
         const gym = new GymModel({
             name: gymLeads.GymLeads[i].Name,
             hours: gymLeads.GymLeads[i].Hours,
-            image: gymLeads.GymLeads[i].Top_Image_URL,
+            images: [
+                {
+                    url: gymLeads.GymLeads[i].Top_Image_URL,
+                    filename:`YelpGym/${i}_${uuidv4()}`
+                }
+            ],
             email: gymLeads.GymLeads[i].Email,
             website: gymLeads.GymLeads[i].Website,
             facebook: gymLeads.GymLeads[i].Facebook,

@@ -56,16 +56,20 @@ module.exports.updateGym = async (req, res) => {
         email: req.body.gym["owner.email"],
     };
     await User.findByIdAndUpdate(req.user._id, ownerDetails);
-    const gym = await GymModel.findByIdAndUpdate(id, {
-        name: req.body.gym.name,
-        address: {
-            streetName: req.body.gym["address.streetName"],
-            city: req.body.gym["address.city"],
-            contactNumber: req.body.gym["address.contactNumber"],
-        },
-        hours: req.body.gym.hours,
-        image: req.body.gym.image,
-    });
+    const gym =  await GymModel.findByIdAndUpdate(id,{...req.body.gym})
+    const imgs = req.files.map(f =>({url: f.path, filename: f.filename}));
+    gym.images.push(...imgs);
+    await gym.save();
+    // const gym = await GymModel.findByIdAndUpdate(id, {
+    //     name: req.body.gym.name,
+    //     address: {
+    //         streetName: req.body.gym["address.streetName"],
+    //         city: req.body.gym["address.city"],
+    //         contactNumber: req.body.gym["address.contactNumber"],
+    //     },
+    //     hours: req.body.gym.hours,
+    //     image: req.body.gym.image,
+    // });
     req.flash("success", "Successfully updated gym!");
     res.redirect(`/gyms/${gym._id}`);
 };

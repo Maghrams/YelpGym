@@ -3,7 +3,7 @@
 <div class="row">
     <h1 class="text-center"> Edit Gym</h1>
     <div class="col-6 offset-3">
-        <form action="/gyms/<%=gym._id%>?_method=PUT" method="POST" novalidate class="validated-form">
+        <form action="/gyms/<%=gym._id%>?_method=PUT" method="POST" novalidate class="validated-form" enctype="multipart/form-data">
             <div class="mb-3">
                 <label for="name" class="form-label"> Name </label>
                 <input type="text" class="form-control" id="name" name="gym[name]" value="<%=gym.name%>" required>
@@ -55,8 +55,8 @@
                 <input id="owner-name" type="text" class="form-control" name="gym[address.contactNumber]" value="<%=gym.address.contactNumber%>" required>
             </div>
             <div class="div mb-3">
-                <label for="image" class="form-label"> Gym Image URL </label>
-                <input type="text" class="form-control" id="image" name="gym[image]" value="<%=gym.image%>" required>
+                <label for="image" class="form-label"> Add Images</label>
+                <input type="file" class="form-control" id="image" name="image" multiple >
             </div>
             <hr class="border border-secondary border-1 opacity-75">
             <div class="mb-3">

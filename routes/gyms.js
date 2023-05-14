@@ -40,7 +40,7 @@ All controller methods are wrapped in `catchAsync` to handle and propagate error
  */
 router.route('/:id')
     .get( catchAsync(gymController.showGym))
-    .put( isLoggedIn, isOwner, validateGym, catchAsync(gymController.updateGym))
+    .put( isLoggedIn, isOwner ,upload.array('image') ,validateGym , catchAsync(gymController.updateGym))
     .delete( isLoggedIn, isOwner, catchAsync(gymController.deleteGym));
 
 //On GET /gyms/:id/edit directory request => render edit page

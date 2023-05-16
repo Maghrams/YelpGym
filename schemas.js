@@ -20,7 +20,8 @@ module.exports.gymValidationSchema = Joi.object({
             email: Joi.string().email().required(),
         })
 
-    }).required().unknown(true)
+    }).required().unknown(true),
+    deleteImages: Joi.array()
 })
 
 module.exports.reviewValidationSchema = Joi.object({

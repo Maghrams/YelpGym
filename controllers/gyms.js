@@ -1,6 +1,6 @@
 const GymModel = require("../models/gym");
 const User = require("../models/user");
-
+const {cloudinary} = require("../cloudinary");
 module.exports.index = async (req, res) => {
     const allGyms = await GymModel.find({});
     res.render("gyms/index", {allGyms});
@@ -49,27 +49,32 @@ module.exports.renderEditForm = async (req, res) => {
 
 module.exports.updateGym = async (req, res) => {
     const {id} = req.params;
-
+    console.log(req.body)
     const ownerDetails = {
         name: req.body.gym["owner.name"],
         phoneNumber: req.body.gym["owner.phoneNumber"],
         email: req.body.gym["owner.email"],
     };
     await User.findByIdAndUpdate(req.user._id, ownerDetails);
-    const gym =  await GymModel.findByIdAndUpdate(id,{...req.body.gym})
+    const gym = await GymModel.findByIdAndUpdate(id, {
+        name: req.body.gym.name,
+        address: {
+            streetName: req.body.gym["address.streetName"],
+            city: req.body.gym["address.city"],
+            contactNumber: req.body.gym["address.contactNumber"],
+        },
+        hours: req.body.gym.hours,
+    });
     const imgs = req.files.map(f =>({url: f.path, filename: f.filename}));
     gym.images.push(...imgs);
     await gym.save();
-    // const gym = await GymModel.findByIdAndUpdate(id, {
-    //     name: req.body.gym.name,
-    //     address: {
-    //         streetName: req.body.gym["address.streetName"],
-    //         city: req.body.gym["address.city"],
-    //         contactNumber: req.body.gym["address.contactNumber"],
-    //     },
-    //     hours: req.body.gym.hours,
-    //     image: req.body.gym.image,
-    // });
+    if(req.body.deleteImages) {
+        for(let filename of req.body.deleteImages) {
+            await cloudinary.uploader.destroy(filename);
+        }
+        await gym.updateOne({$pull: {images: {filename: {$in: req.body.deleteImages}}}});
+        console.log(gym, req.body.deleteImages)
+    }
     req.flash("success", "Successfully updated gym!");
     res.redirect(`/gyms/${gym._id}`);
 };

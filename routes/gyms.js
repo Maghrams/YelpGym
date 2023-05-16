@@ -23,7 +23,7 @@ router.route('/')
     .post( isLoggedIn,upload.array('image') ,validateGym , catchAsync(gymController.createGym)
 );
 
-//On GET /gyms/new directory request => render new page
+//On GET /gyms/new di   rectory request => render new page
 router.get("/new", isLoggedIn, gymController.renderNewForm);
 
 

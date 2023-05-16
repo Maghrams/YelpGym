@@ -55,8 +55,17 @@
                 <input id="owner-name" type="text" class="form-control" name="gym[address.contactNumber]" value="<%=gym.address.contactNumber%>" required>
             </div>
             <div class="div mb-3">
-                <label for="image" class="form-label"> Add Images</label>
+                <label for="image" class="form-label"> Upload Images</label>
                 <input type="file" class="form-control" id="image" name="image" multiple >
+            </div>
+            <div class="mb-3">
+                <%gym.images.forEach(function(img, i){%>
+                    <img src="<%=img.thumbnail%>" class="img-thumbnail" alt="">
+                    <div class="form-check-inline">
+                        <input type="checkbox" id="image-<%=i%>" name="deleteImages[]" value="<%=img.filename%>">
+                    </div>
+                <label for="image-<%=i%>">Delete?</label>
+                <%})%>
             </div>
             <hr class="border border-secondary border-1 opacity-75">
             <div class="mb-3">
@@ -77,10 +86,6 @@
                 <button class="btn btn-info">Edit Gym</button>
             </div>
         </form>
-
-        <a href="/gyms/<%=gym._id%>">Back to Gym</a>
-        <br>
-        <a  href="/gyms"> All Gyms</a>
     </div>
 </div>
 

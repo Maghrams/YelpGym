@@ -1,6 +1,26 @@
 const GymModel = require("../models/gym");
 const User = require("../models/user");
 const {cloudinary} = require("../cloudinary");
+
+const addGoogleAutoTagging = async (publicIds) => {
+    try {
+        const updatePromises = publicIds.map(async (publicId) => {
+            const result = await cloudinary.api.update(publicId, {
+                categorization: 'google_tagging',
+                auto_tagging: 0.6,
+            });
+            console.log("that start of this");
+            console.log(result.tags)
+            console.log("the end of this");
+        });
+
+        await Promise.all(updatePromises);
+    } catch (error) {
+        console.error('Error updating images with auto-tagging:', error);
+    }
+};
+
+
 module.exports.index = async (req, res) => {
     const allGyms = await GymModel.find({});
     res.render("gyms/index", {allGyms});
@@ -20,6 +40,20 @@ module.exports.createGym = async (req, res, next) => {
     req.flash("success", "Successfully made a new gym!");
     res.redirect(`/gyms/${gym._id}`);
 }
+
+module.exports.createGym = async (req, res, next) => {
+    const gym = new GymModel(req.body.gym);
+    gym.images = req.files.map(f => ({ url: f.path, filename: f.filename }));
+    gym.owner = req.user._id;
+    await gym.save();
+
+    // Add Google auto-tagging to the uploaded images
+    const publicIds = req.files.map(f => f.filename);
+    await addGoogleAutoTagging(publicIds);
+
+    req.flash("success", "Successfully made a new gym!");
+    res.redirect(`/gyms/${gym._id}`);
+};
 
 module.exports.showGym = async (req, res) => {
     const gym = await GymModel.findById(req.params.id)
@@ -65,9 +99,14 @@ module.exports.updateGym = async (req, res) => {
         },
         hours: req.body.gym.hours,
     });
-    const imgs = req.files.map(f =>({url: f.path, filename: f.filename}));
+
+    const imgs = req.files.map(f => ({ url: f.path, filename: f.filename }));
     gym.images.push(...imgs);
     await gym.save();
+    // Add Google auto-tagging to the uploaded images
+    const publicIds = req.files.map(f => f.filename);
+    await addGoogleAutoTagging(publicIds);
+
     if(req.body.deleteImages) {
         for(let filename of req.body.deleteImages) {
             await cloudinary.uploader.destroy(filename);

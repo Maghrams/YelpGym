@@ -54,21 +54,52 @@ module.exports.createGym = async (req, res, next) => {
     req.flash("success", "Successfully made a new gym!");
     res.redirect(`/gyms/${gym._id}`);
 };
-
 module.exports.showGym = async (req, res) => {
-    const gym = await GymModel.findById(req.params.id)
-        .populate({
-            path:"totalReview.reviews",
-            populate:{
-                path:"author"
+    try {
+        const gym = await GymModel.findById(req.params.id)
+            .populate({
+                path: 'totalReview.reviews',
+                populate: {
+                    path: 'author',
+                },
+            })
+            .populate('owner');
+
+        if (!gym) {
+            req.flash('error', 'Cannot find that gym!');
+            return res.redirect('/gyms');
+        }
+
+        // Fetch tags for each image in gym.images
+        const imagePromises = gym.images.map(async (image) => {
+            try {
+                const publicId = image.filename;
+                const imageDetails = await cloudinary.api.resource(publicId);
+                const tags =
+                    imageDetails &&
+                    imageDetails.info &&
+                    imageDetails.info.categorization &&
+                    imageDetails.info.categorization.google_tagging &&
+                    imageDetails.info.categorization.google_tagging.data
+                        ? imageDetails.info.categorization.google_tagging.data
+                        : [];
+                return tags;
+            } catch (error) {
+                console.error('Error fetching tags for image:', image.filename, error);
+                return []; // Return an empty array in case of an error
             }
-        })
-        .populate("owner");
-    if (!gym) {
-        req.flash("error", "Cannot find that gym!");
-        return res.redirect("/gyms");
+        });
+
+        // Add the tags to the gym object
+        const allTags = await Promise.all(imagePromises);
+        const flattenedTags = [].concat(...allTags); // Flatten the array of tags
+
+        res.render('gyms/show', { gym, tags: flattenedTags });
+    } catch (error) {
+        console.error('Error in showGym route:', error);
+        req.flash('error', 'Oh no, something went wrong!');
+        res.redirect('/gyms');
     }
-    res.render("gyms/show", {gym});
 };
 
 module.exports.renderEditForm = async (req, res) => {

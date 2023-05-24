@@ -32,6 +32,29 @@
                 <h5 class="card-title"><%= gym.name%></h5>
                 <p class="card-text text-muted"><%= gym.address.streetName%></p>
             </div>
+            <div class="card-body">
+                <% if (tags && tags.length) { %>
+                    <h3>Tags:</h3>
+                    <div class="row">
+                        <% tags.forEach((tag) => { %>
+                            <% if (tag.confidence >= 0.7) { %>
+                                <div class="col-md-4">
+                                    <div class="card mb-3">
+                                        <div class="card-body">
+                                            <div class="custom-control custom-checkbox">
+                                                <input type="checkbox" class="custom-control-input" id="tag-<%= tag.tag %>">
+                                                <label class="custom-control-label" for="tag-<%= tag.tag %>">
+                                                    <%= tag.tag %> (<%= tag.confidence.toFixed(2) %>)
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            <% } %>
+                        <% }) %>
+                    </div>
+                <% } %>
+            </div>
             <!--`TODO Add SVGs to resources directory-->
             <!--TODO replace hardcoded spaces-->
             <ul class="list-group list-group-flush">

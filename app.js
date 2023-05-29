@@ -14,6 +14,10 @@ const LocalStrategy = require('passport-local');//Local Strategy to authenticate
 const User = require('./models/user');//Import User model
 
 //Import Routes
+/*
+importing the different route modules for gyms, reviews, and users.
+ These route modules typically contain the API endpoints for handling different requests related to the respective resources.
+ */
 const gymRoutes = require('./routes/gyms');//Import gym routes
 const reviewRoutes = require('./routes/reviews');//Import review routes
 const userRoutes = require('./routes/users');//Import user routes
@@ -36,16 +40,21 @@ db.once("open",()=>{
 //Initialize express app
 const app = express();
 
+// Set up the EJS template engine
 app.engine('ejs',ejsMate)
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'))
 
+// Middleware for parsing request bodies, handling method overrides, and logging requests
 app.use(express.urlencoded({extended:true}))
 app.use(methodOverride('_method'))
 app.use(morgan('dev'))
+
+// Serve favicon and static files from the specified directories
 app.use('/favicon.ico', express.static('resources/favicon.ico'));
 app.use(express.static(path.join(__dirname, 'public')))
 
+// Set up session configuration
 const sessionConfig = {
     secret: process.env.SECRET,
     resave: false,
@@ -57,28 +66,36 @@ const sessionConfig = {
     }
 }
 
+// Middleware for session handling, flash messages, and Passport.js authentication
 app.use(session(sessionConfig));
 app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
 passport.use(new LocalStrategy(User.authenticate()));
 
+//Passport.js methods for session storing and destroying (provided by passport-local-mongoose)
 //These two methods are provided by passport-local-mongoose for session storing and destroying
 passport.serializeUser(User.serializeUser());
 passport.deserializeUser(User.deserializeUser());
 
-//Custom Middleware to send flash messages to the user
+// Middleware for setting up local variables (currentUser, success, and error) in response objects
+
 app.use((req, res, next)=>{
+    // Store the current user from the request object in the response object.
     res.locals.currentUser = req.user;
+    // Store success messages from the flash middleware in the response object.
     res.locals.success = req.flash('success');
-    res.locals.error = req.flash('error');
+    // Store error messages from the flash middleware in the response object.
+   res.locals.error = req.flash('error');
+    // Proceed to the next middleware or route handler
     next();
 })
 
 //Routes
-app.use('/gyms',gymRoutes);
-app.use('/gyms/:id/reviews',reviewRoutes);
-app.use('/',userRoutes);
+// Register the route handlers for gyms, reviews, and users with their respective URL prefixes.
+app.use('/gyms',gymRoutes);// Main gym routes
+app.use('/gyms/:id/reviews',reviewRoutes);// Review routes, nested under gym routes
+app.use('/',userRoutes);// User routes, with no specific prefix
 
 //On GET root directory request => render home page
 app.get('/',(req, res) =>{
@@ -87,7 +104,6 @@ app.get('/',(req, res) =>{
 
 //TODO Apply page not found for non-existing gym IDs and { /gyms/* } pages
 //If Page doesnt exist, render not_found page and send 404 status code
-
 app.all('*',(req, res,next)=>{
     res.status(404).render("not_found")
 })
@@ -102,8 +118,8 @@ app.use((err,req,res,next)=>{
     res.status(statusCode).render("error",{err});
 })
 
-app.listen(3000, ()=>{
+// Start the Express app server on port 3000 and log a message to the console
+app.listen(3000, () => {
     console.log('Serving on port 3000');
-})
-
+});
 

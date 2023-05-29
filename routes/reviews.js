@@ -16,8 +16,9 @@ router.post('/',isLoggedIn ,validateReview, catchAsync(reviewController.createRe
 
  */
 router.delete('/:reviewId',isLoggedIn ,isReviewAuthor, catchAsync(reviewController.deleteReview))
-
 /*
+
 3. `module.exports = router;`: Exports the router object, making the defined routes available for use in other parts of the application.
  */
 module.exports = router;
+

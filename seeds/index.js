@@ -5,6 +5,25 @@ const gymLeads = require("./gym_leads_plus.json")
 const ReviewModel = require("../models/review");
 const { v4: uuidv4 } = require('uuid');
 
+/*
+Connects to the MongoDB database using mongoose.connect with the connection string from the environment variable process.env.CONNECTION_STRING.
+ The connection options include useNewUrlParser, useCreateIndex, useUnifiedTopology, and useFindAndModify.
+
+Sets up event listeners for the Mongoose connection (db):
+
+db.on("error", ...): Logs any connection errors to the console.
+db.once("open", ...): Logs a message to the console when the database connection is established.
+Deletes all existing documents from the GymModel and ReviewModel collections using deleteMany({}).
+
+Iterates through the gymLeads.GymLeads array and creates new GymModel instances for each gym.
+ The gym data is extracted from the gymLeads.GymLeads[i] object and used to populate the new gym document's properties.
+
+Saves each new gym document to the GymModel collection using await gym.save().
+
+When you run the seedDB function, it will connect to the MongoDB database,
+ delete all existing gym and review documents,
+  and populate the database with new gym documents based on the gym data from the gymLeads object.
+ */
 const seedDB = async() =>{
 
     await mongoose.connect(process.env.CONNECTION_STRING, {

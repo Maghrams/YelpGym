@@ -23,9 +23,22 @@ router.route('/')
     .post( isLoggedIn,upload.array('image') ,validateGym , catchAsync(gymController.createGym)
 );
 
+//
+// function createGymRoute(req, res, next) {
+//     try{
+//         isloggedIn();
+//         upload.array('image');
+//         validateGym();
+//         catchAsync();
+//         return gymGonctroler.creatGym()
+//     }catch (e) {
+//         return e;
+//     }
+// }
+
+
 //On GET /gyms/new di   rectory request => render new page
 router.get("/new", isLoggedIn, gymController.renderNewForm);
-
 
 
 //--------------------Show Gym Routes--------------------
